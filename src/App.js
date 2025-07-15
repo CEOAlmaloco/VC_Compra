@@ -172,46 +172,7 @@ function App() {
       <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
         <Header onSyncComplete={handleSyncComplete} />
         <Box sx={{ p: 3 }}>
-          {/* Gestión de categorías compacta y arriba */}
-          <Accordion
-            expanded={showCategoryManager}
-            onChange={() => setShowCategoryManager(!showCategoryManager)}
-            sx={{ mb: 2, maxWidth: 900, mx: 'auto', borderRadius: 2, boxShadow: 1 }}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Gestión de Categorías
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <CategoryManager
-                categories={categories}
-                excludedCategories={excludedCategories}
-                onExcludedCategoriesChange={setExcludedCategories}
-              />
-            </AccordionDetails>
-          </Accordion>
-
-          {/* Botón de test data toggle */}
-          <Box sx={{ display: 'flex', gap: 2, mb: 3, alignItems: 'center', justifyContent: 'center' }}>
-            <button
-              onClick={handleToggleTestData}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: forceTestData ? '#ff9800' : '#e0e0e0',
-                color: forceTestData ? 'white' : '#666',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                minWidth: 120
-              }}
-            >
-              {forceTestData ? 'Datos de Prueba ON' : 'Datos de Prueba OFF'}
-            </button>
-          </Box>
-
+          {/* Lista de productos primero */}
           <ShoppingList
             categories={categories}
             excludedCategories={excludedCategories}
@@ -219,6 +180,49 @@ function App() {
             onAddProduct={handleAddProduct}
             onDeleteProduct={handleDeleteProduct}
           />
+
+          {/* Gestión de categorías y test data abajo */}
+          <Box sx={{ mt: 4, maxWidth: 900, mx: 'auto' }}>
+            {/* Gestión de categorías compacta */}
+            <Accordion
+              expanded={showCategoryManager}
+              onChange={() => setShowCategoryManager(!showCategoryManager)}
+              sx={{ mb: 2, borderRadius: 2, boxShadow: 1 }}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Gestión de Categorías
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <CategoryManager
+                  categories={categories}
+                  excludedCategories={excludedCategories}
+                  onExcludedCategoriesChange={setExcludedCategories}
+                />
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Botón de test data toggle */}
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+              <button
+                onClick={handleToggleTestData}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: forceTestData ? '#ff9800' : '#e0e0e0',
+                  color: forceTestData ? 'white' : '#666',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  minWidth: 120
+                }}
+              >
+                {forceTestData ? 'Datos de Prueba ON' : 'Datos de Prueba OFF'}
+              </button>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </ThemeProvider>
