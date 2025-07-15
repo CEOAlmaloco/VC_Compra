@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box } from '@mui/material';
+import { CssBaseline, Box, Accordion, AccordionSummary, AccordionDetails, Typography, IconButton } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShoppingList from './components/ShoppingList';
 import CategoryManager from './components/CategoryManager';
 import Header from './components/Header';
@@ -44,6 +45,8 @@ function App() {
   const [excludedCategories, setExcludedCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [forceTestData, setForceTestData] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [backupData, setBackupData] = useState([]); // Para restaurar datos reales
   
   const { 
     isAuthenticated, 
@@ -104,7 +107,7 @@ function App() {
       }
 
       setProducts(dataToLoad);
-      
+      setBackupData(dataToLoad); // Guardar backup para restaurar
       // Extraer categorías únicas
       const uniqueCategories = [...new Set(dataToLoad.map(product => product.category))];
       setCategories(uniqueCategories);
@@ -117,18 +120,12 @@ function App() {
   const handleAddProduct = (product) => {
     const newProducts = [...products, { ...product, id: Date.now() }];
     setProducts(newProducts);
-    
-    // Guardar en localStorage
     localStorage.setItem('shoppingList', JSON.stringify(newProducts));
-    
-    // Si el usuario está autenticado, guardar también en la cuenta
     if (isAuthenticated) {
       saveUserData(newProducts).catch(error => {
         console.error('Error guardando datos en la cuenta:', error);
       });
     }
-    
-    // Actualizar categorías
     if (!categories.includes(product.category)) {
       setCategories([...categories, product.category]);
     }
@@ -137,11 +134,7 @@ function App() {
   const handleDeleteProduct = (productId) => {
     const newProducts = products.filter(product => product.id !== productId);
     setProducts(newProducts);
-    
-    // Guardar en localStorage
     localStorage.setItem('shoppingList', JSON.stringify(newProducts));
-    
-    // Si el usuario está autenticado, guardar también en la cuenta
     if (isAuthenticated) {
       saveUserData(newProducts).catch(error => {
         console.error('Error guardando datos en la cuenta:', error);
@@ -150,21 +143,26 @@ function App() {
   };
 
   const handleSyncComplete = () => {
-    // Recargar datos después de la sincronización
     loadInitialData();
     checkLocalData();
   };
 
+  // Toggle real para datos de prueba ON/OFF
   const handleToggleTestData = () => {
-    setForceTestData(!forceTestData);
     if (!forceTestData) {
+      // Activar datos de prueba
+      setBackupData(products); // Guardar backup de los datos reales
       const testData = getTestData();
       setProducts(testData);
       localStorage.setItem('shoppingList', JSON.stringify(testData));
-      
-      // Extraer categorías únicas
-      const uniqueCategories = [...new Set(testData.map(product => product.category))];
-      setCategories(uniqueCategories);
+      setCategories([...new Set(testData.map(product => product.category))]);
+      setForceTestData(true);
+    } else {
+      // Restaurar datos reales/locales
+      setProducts(backupData);
+      localStorage.setItem('shoppingList', JSON.stringify(backupData));
+      setCategories([...new Set(backupData.map(product => product.category))]);
+      setForceTestData(false);
     }
   };
 
@@ -173,31 +171,45 @@ function App() {
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
         <Header onSyncComplete={handleSyncComplete} />
-        
         <Box sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-            <CategoryManager
-              categories={categories}
-              excludedCategories={excludedCategories}
-              onExcludedCategoriesChange={setExcludedCategories}
-            />
-            
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <button
-                onClick={handleToggleTestData}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: forceTestData ? '#ff9800' : '#e0e0e0',
-                  color: forceTestData ? 'white' : '#666',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px'
-                }}
-              >
-                {forceTestData ? 'Datos de Prueba ON' : 'Datos de Prueba OFF'}
-              </button>
-            </Box>
+          {/* Gestión de categorías compacta y arriba */}
+          <Accordion
+            expanded={showCategoryManager}
+            onChange={() => setShowCategoryManager(!showCategoryManager)}
+            sx={{ mb: 2, maxWidth: 900, mx: 'auto', borderRadius: 2, boxShadow: 1 }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Gestión de Categorías
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <CategoryManager
+                categories={categories}
+                excludedCategories={excludedCategories}
+                onExcludedCategoriesChange={setExcludedCategories}
+              />
+            </AccordionDetails>
+          </Accordion>
+
+          {/* Botón de test data toggle */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, alignItems: 'center', justifyContent: 'center' }}>
+            <button
+              onClick={handleToggleTestData}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: forceTestData ? '#ff9800' : '#e0e0e0',
+                color: forceTestData ? 'white' : '#666',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                minWidth: 120
+              }}
+            >
+              {forceTestData ? 'Datos de Prueba ON' : 'Datos de Prueba OFF'}
+            </button>
           </Box>
 
           <ShoppingList
