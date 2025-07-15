@@ -7,6 +7,7 @@ import CategoryManager from './components/CategoryManager';
 import Header from './components/Header';
 import useAuthStore from './store/authStore';
 import { getTestData } from './data/testData';
+import { createTestUser, checkTestUser, removeTestUser, testUserCredentials } from './data/testUser';
 
 // Tema personalizado
 const theme = createTheme({
@@ -212,8 +213,8 @@ function App() {
               </AccordionDetails>
             </Accordion>
 
-            {/* Botón de test data toggle */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+            {/* Botones de test data y usuario de prueba */}
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 onClick={handleToggleTestData}
                 style={{
@@ -229,6 +230,31 @@ function App() {
                 }}
               >
                 {forceTestData ? 'Datos de Prueba ON' : 'Datos de Prueba OFF'}
+              </button>
+              
+              <button
+                onClick={() => {
+                  if (checkTestUser()) {
+                    removeTestUser();
+                    alert('Usuario de prueba eliminado');
+                  } else {
+                    createTestUser();
+                    alert(`Usuario de prueba creado!\n\nCredenciales:\nEmail: ${testUserCredentials.login.email}\nContraseña: ${testUserCredentials.login.password}`);
+                  }
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: checkTestUser() ? '#f44336' : '#4caf50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  minWidth: 120
+                }}
+              >
+                {checkTestUser() ? 'Eliminar Usuario Test' : 'Crear Usuario Test'}
               </button>
             </Box>
           </Box>

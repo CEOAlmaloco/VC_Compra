@@ -324,102 +324,94 @@ const AuthModal = ({ open, onClose }) => {
         ) : (
           // Formulario de Registro
           <Box component="form" onSubmit={registerForm.handleSubmit(onSubmitRegister)}>
-            <Controller
-              name="username"
-              control={registerForm.control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Nombre de usuario"
-                  fullWidth
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  disabled={isLoading}
-                  autoComplete="username"
-                  autoFocus
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  placeholder="Ingresa tu nombre de usuario"
-                  sx={{
-                    '& .MuiInputBase-input, & input': {
-                      color: '#000 !important',
-                      backgroundColor: '#fff !important',
-                      opacity: '1 !important',
-                      visibility: 'visible !important',
-                      caretColor: '#1976d2 !important'
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: '#666 !important'
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#fff !important',
-                      '& fieldset': {
-                        borderColor: '#ccc !important'
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#1976d2 !important'
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#1976d2 !important'
-                      }
-                    },
-                    '& .MuiFormHelperText-root': {
-                      color: '#666 !important'
-                    }
-                  }}
-                />
-              )}
+            <TextField
+              label="Nombre de usuario"
+              fullWidth
+              margin="normal"
+              error={!!registerForm.formState.errors.username}
+              helperText={registerForm.formState.errors.username?.message}
+              disabled={isLoading}
+              autoComplete="username"
+              autoFocus
+              value={registerForm.watch('username') || ''}
+              onChange={(e) => {
+                console.log('Username input value:', e.target.value);
+                registerForm.setValue('username', e.target.value);
+              }}
+              onBlur={() => registerForm.trigger('username')}
+              placeholder="Ingresa tu nombre de usuario"
+              sx={{
+                '& .MuiInputBase-input, & input': {
+                  color: '#000 !important',
+                  backgroundColor: '#fff !important',
+                  opacity: '1 !important',
+                  visibility: 'visible !important',
+                  caretColor: '#1976d2 !important'
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#666 !important'
+                },
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#fff !important',
+                  '& fieldset': {
+                    borderColor: '#ccc !important'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#1976d2 !important'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#1976d2 !important'
+                  }
+                },
+                '& .MuiFormHelperText-root': {
+                  color: '#666 !important'
+                }
+              }}
             />
 
-            <Controller
-              name="email"
-              control={registerForm.control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  disabled={isLoading}
-                  autoComplete="email"
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  placeholder="Ingresa tu email"
-                  sx={{
-                    '& .MuiInputBase-input, & input': {
-                      color: '#000 !important',
-                      backgroundColor: '#fff !important',
-                      opacity: '1 !important',
-                      visibility: 'visible !important',
-                      caretColor: '#1976d2 !important'
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: '#666 !important'
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#fff !important',
-                      '& fieldset': {
-                        borderColor: '#ccc !important'
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#1976d2 !important'
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#1976d2 !important'
-                      }
-                    },
-                    '& .MuiFormHelperText-root': {
-                      color: '#666 !important'
-                    }
-                  }}
-                />
-              )}
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              margin="normal"
+              error={!!registerForm.formState.errors.email}
+              helperText={registerForm.formState.errors.email?.message}
+              disabled={isLoading}
+              autoComplete="email"
+              value={registerForm.watch('email') || ''}
+              onChange={(e) => {
+                console.log('Email input value:', e.target.value);
+                registerForm.setValue('email', e.target.value);
+              }}
+              onBlur={() => registerForm.trigger('email')}
+              placeholder="Ingresa tu email"
+              sx={{
+                '& .MuiInputBase-input, & input': {
+                  color: '#000 !important',
+                  backgroundColor: '#fff !important',
+                  opacity: '1 !important',
+                  visibility: 'visible !important',
+                  caretColor: '#1976d2 !important'
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#666 !important'
+                },
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#fff !important',
+                  '& fieldset': {
+                    borderColor: '#ccc !important'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#1976d2 !important'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#1976d2 !important'
+                  }
+                },
+                '& .MuiFormHelperText-root': {
+                  color: '#666 !important'
+                }
+              }}
             />
 
             <Controller
