@@ -334,13 +334,44 @@ const AuthModal = ({ open, onClose }) => {
                   fullWidth
                   margin="normal"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText={fieldState.error?.message || 'Ingresa tu nombre de usuario'}
                   disabled={isLoading}
                   autoComplete="username"
                   autoFocus
                   value={field.value ?? ''}
-                  onChange={field.onChange}
+                  onChange={(e) => {
+                    console.log('Username onChange:', e.target.value);
+                    field.onChange(e);
+                  }}
                   onBlur={field.onBlur}
+                  onFocus={(e) => {
+                    console.log('Username onFocus');
+                    e.target.select();
+                  }}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      color: '#000000 !important',
+                      backgroundColor: '#ffffff !important',
+                      caretColor: '#1976d2 !important'
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666666 !important'
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: '#cccccc !important'
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#1976d2 !important'
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#1976d2 !important'
+                      }
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#666666 !important'
+                    }
+                  }}
                 />
               )}
             />
@@ -356,12 +387,42 @@ const AuthModal = ({ open, onClose }) => {
                   fullWidth
                   margin="normal"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText={fieldState.error?.message || 'Ingresa tu email'}
                   disabled={isLoading}
                   autoComplete="email"
                   value={field.value ?? ''}
-                  onChange={field.onChange}
+                  onChange={(e) => {
+                    console.log('Email onChange:', e.target.value);
+                    field.onChange(e);
+                  }}
                   onBlur={field.onBlur}
+                  onFocus={(e) => {
+                    console.log('Email onFocus');
+                  }}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      color: '#000000 !important',
+                      backgroundColor: '#ffffff !important',
+                      caretColor: '#1976d2 !important'
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#666666 !important'
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: '#cccccc !important'
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#1976d2 !important'
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#1976d2 !important'
+                      }
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#666666 !important'
+                    }
+                  }}
                 />
               )}
             />
