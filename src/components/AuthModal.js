@@ -115,6 +115,10 @@ const AuthModal = ({ open, onClose }) => {
       loginForm.reset();
       registerForm.reset();
       clearError();
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setLoginAttempts(0);
+      setIsBlocked(false);
     }
   }, [open, loginForm, registerForm, clearError]);
 
@@ -135,6 +139,9 @@ const AuthModal = ({ open, onClose }) => {
     loginForm.reset();
     registerForm.reset();
     setLoginAttempts(0);
+    setIsBlocked(false);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const handleClose = () => {
@@ -144,6 +151,8 @@ const AuthModal = ({ open, onClose }) => {
     setActiveTab(0);
     setLoginAttempts(0);
     setIsBlocked(false);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     onClose();
   };
 
@@ -259,6 +268,12 @@ const AuthModal = ({ open, onClose }) => {
                   disabled={isLoading || isBlocked}
                   autoComplete="email"
                   autoFocus
+                  onChange={(e) => {
+                    field.onChange(e);
+                    loginForm.clearErrors('email');
+                  }}
+                  onBlur={field.onBlur}
+                  value={field.value || ''}
                 />
               )}
             />
@@ -277,6 +292,12 @@ const AuthModal = ({ open, onClose }) => {
                   helperText={fieldState.error?.message}
                   disabled={isLoading || isBlocked}
                   autoComplete="current-password"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    loginForm.clearErrors('password');
+                  }}
+                  onBlur={field.onBlur}
+                  value={field.value || ''}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -323,6 +344,12 @@ const AuthModal = ({ open, onClose }) => {
                   disabled={isLoading}
                   autoComplete="username"
                   autoFocus
+                  onChange={(e) => {
+                    field.onChange(e);
+                    registerForm.clearErrors('username');
+                  }}
+                  onBlur={field.onBlur}
+                  value={field.value || ''}
                 />
               )}
             />
@@ -341,6 +368,12 @@ const AuthModal = ({ open, onClose }) => {
                   helperText={fieldState.error?.message}
                   disabled={isLoading}
                   autoComplete="email"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    registerForm.clearErrors('email');
+                  }}
+                  onBlur={field.onBlur}
+                  value={field.value || ''}
                 />
               )}
             />
@@ -364,6 +397,12 @@ const AuthModal = ({ open, onClose }) => {
                     }
                     disabled={isLoading}
                     autoComplete="new-password"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      registerForm.clearErrors('password');
+                    }}
+                    onBlur={field.onBlur}
+                    value={field.value || ''}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -401,6 +440,12 @@ const AuthModal = ({ open, onClose }) => {
                   helperText={fieldState.error?.message}
                   disabled={isLoading}
                   autoComplete="new-password"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    registerForm.clearErrors('confirmPassword');
+                  }}
+                  onBlur={field.onBlur}
+                  value={field.value || ''}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
