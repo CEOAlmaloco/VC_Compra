@@ -2,7 +2,7 @@
   "name": "vc-compra",
   "version": "1.0.0",
   "description": "Aplicación web para gestión de listas de compras online",
-  "homepage": "https://tu-usuario.github.io/VC_Compra",
+  "homepage": "https://CEOAlmaloco.github.io/VC_Compra",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
