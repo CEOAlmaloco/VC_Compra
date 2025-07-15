@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/VC_Compra/static/js/main.ee8ffcad.js",
+    "main.js": "/VC_Compra/static/js/main.a4b516de.js",
     "static/js/390.5fa6f074.chunk.js": "/VC_Compra/static/js/390.5fa6f074.chunk.js",
     "index.html": "/VC_Compra/index.html",
-    "main.ee8ffcad.js.map": "/VC_Compra/static/js/main.ee8ffcad.js.map",
+    "main.a4b516de.js.map": "/VC_Compra/static/js/main.a4b516de.js.map",
     "390.5fa6f074.chunk.js.map": "/VC_Compra/static/js/390.5fa6f074.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.ee8ffcad.js"
+    "static/js/main.a4b516de.js"
   ]
 }
