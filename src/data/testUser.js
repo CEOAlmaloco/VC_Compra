@@ -26,8 +26,8 @@ export const testUserCredentials = {
  */
 export const createTestUser = () => {
   try {
-    // Obtener usuarios existentes
-    const existingUsers = JSON.parse(localStorage.getItem('vc-compra-users') || '[]');
+    // Obtener usuarios existentes - usar la misma clave que authService
+    const existingUsers = JSON.parse(localStorage.getItem('vc_compra_users') || '[]');
     
     // Verificar si el usuario de prueba ya existe
     const userExists = existingUsers.find(u => u.email === testUser.email);
@@ -47,7 +47,7 @@ export const createTestUser = () => {
       
       // Agregar usuario
       existingUsers.push(newUser);
-      localStorage.setItem('vc-compra-users', JSON.stringify(existingUsers));
+      localStorage.setItem('vc_compra_users', JSON.stringify(existingUsers));
       
       console.log('✅ Usuario de prueba creado:', testUser);
       return true;
@@ -66,7 +66,7 @@ export const createTestUser = () => {
  */
 export const checkTestUser = () => {
   try {
-    const existingUsers = JSON.parse(localStorage.getItem('vc-compra-users') || '[]');
+    const existingUsers = JSON.parse(localStorage.getItem('vc_compra_users') || '[]');
     const userExists = existingUsers.find(u => u.email === testUser.email);
     return !!userExists;
   } catch (error) {
@@ -80,9 +80,9 @@ export const checkTestUser = () => {
  */
 export const removeTestUser = () => {
   try {
-    const existingUsers = JSON.parse(localStorage.getItem('vc-compra-users') || '[]');
+    const existingUsers = JSON.parse(localStorage.getItem('vc_compra_users') || '[]');
     const filteredUsers = existingUsers.filter(u => u.email !== testUser.email);
-    localStorage.setItem('vc-compra-users', JSON.stringify(filteredUsers));
+    localStorage.setItem('vc_compra_users', JSON.stringify(filteredUsers));
     console.log('🗑️ Usuario de prueba eliminado');
     return true;
   } catch (error) {

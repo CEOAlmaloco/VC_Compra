@@ -88,7 +88,12 @@ class AuthService {
    */
   generateToken(payload) {
     try {
-      return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+      // Crear un token simple para el navegador
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const payloadEncoded = btoa(JSON.stringify(payload));
+      const signature = btoa(JWT_SECRET + Date.now());
+      
+      return `${header}.${payloadEncoded}.${signature}`;
     } catch (error) {
       console.error('Error generando token:', error);
       throw new Error('Error al generar token');
@@ -102,7 +107,11 @@ class AuthService {
    */
   verifyToken(token) {
     try {
-      return jwt.verify(token, JWT_SECRET);
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      
+      const payload = JSON.parse(atob(parts[1]));
+      return payload;
     } catch (error) {
       console.error('Error verificando token:', error);
       return null;
