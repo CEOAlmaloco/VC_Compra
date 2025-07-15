@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -13,7 +13,8 @@ import {
   Alert,
   CircularProgress,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Divider
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,19 +22,50 @@ import * as yup from 'yup';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import LockIcon from '@mui/icons-material/Lock';
+import PersonIcon from '@mui/icons-material/Person';
 import useAuthStore from '../store/authStore';
 
-// Esquemas de validación
+// Esquemas de validación mejorados
 const loginSchema = yup.object({
-  email: yup.string().email('Email inválido').required('Email es requerido'),
-  password: yup.string().min(6, 'Mínimo 6 caracteres').required('Contraseña es requerida')
+  email: yup
+    .string()
+    .email('Email inválido')
+    .required('Email es requerido')
+    .trim(),
+  password: yup
+    .string()
+    .min(6, 'Mínimo 6 caracteres')
+    .required('Contraseña es requerida')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      'La contraseña debe contener al menos una mayúscula, una minúscula y un número'
+    )
 });
 
 const registerSchema = yup.object({
-  username: yup.string().min(3, 'Mínimo 3 caracteres').required('Usuario es requerido'),
-  email: yup.string().email('Email inválido').required('Email es requerido'),
-  password: yup.string().min(6, 'Mínimo 6 caracteres').required('Contraseña es requerida'),
-  confirmPassword: yup.string()
+  username: yup
+    .string()
+    .min(3, 'Mínimo 3 caracteres')
+    .max(20, 'Máximo 20 caracteres')
+    .matches(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guiones bajos')
+    .required('Usuario es requerido')
+    .trim(),
+  email: yup
+    .string()
+    .email('Email inválido')
+    .required('Email es requerido')
+    .trim(),
+  password: yup
+    .string()
+    .min(8, 'Mínimo 8 caracteres')
+    .required('Contraseña es requerida')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+      'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial'
+    ),
+  confirmPassword: yup
+    .string()
     .oneOf([yup.ref('password'), null], 'Las contraseñas deben coincidir')
     .required('Confirmar contraseña es requerida')
 });
@@ -45,6 +77,8 @@ const AuthModal = ({ open, onClose }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
   
   const { 
     login, 
@@ -60,7 +94,8 @@ const AuthModal = ({ open, onClose }) => {
     defaultValues: {
       email: '',
       password: ''
-    }
+    },
+    mode: 'onChange'
   });
 
   const registerForm = useForm({
@@ -70,14 +105,36 @@ const AuthModal = ({ open, onClose }) => {
       email: '',
       password: '',
       confirmPassword: ''
-    }
+    },
+    mode: 'onChange'
   });
+
+  // Resetear formularios cuando se abre el modal
+  useEffect(() => {
+    if (open) {
+      loginForm.reset();
+      registerForm.reset();
+      clearError();
+    }
+  }, [open, loginForm, registerForm, clearError]);
+
+  // Bloquear después de 5 intentos fallidos
+  useEffect(() => {
+    if (loginAttempts >= 5) {
+      setIsBlocked(true);
+      setTimeout(() => {
+        setIsBlocked(false);
+        setLoginAttempts(0);
+      }, 300000); // 5 minutos
+    }
+  }, [loginAttempts]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     clearError();
     loginForm.reset();
     registerForm.reset();
+    setLoginAttempts(0);
   };
 
   const handleClose = () => {
@@ -85,25 +142,53 @@ const AuthModal = ({ open, onClose }) => {
     loginForm.reset();
     registerForm.reset();
     setActiveTab(0);
+    setLoginAttempts(0);
+    setIsBlocked(false);
     onClose();
   };
 
   const onSubmitLogin = async (data) => {
+    if (isBlocked) {
+      return;
+    }
+
     try {
-      await login(data.email, data.password);
+      await login(data.email.trim(), data.password);
       handleClose();
+      setLoginAttempts(0);
     } catch (error) {
-      // Error ya manejado por el store
+      setLoginAttempts(prev => prev + 1);
+      console.error('Error en login:', error);
     }
   };
 
   const onSubmitRegister = async (data) => {
     try {
-      await register(data.username, data.email, data.password);
+      await register(data.username.trim(), data.email.trim(), data.password);
       handleClose();
     } catch (error) {
-      // Error ya manejado por el store
+      console.error('Error en registro:', error);
     }
+  };
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, color: 'grey', label: '' };
+    
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[@$!%*?&]/.test(password)) strength++;
+
+    const colors = ['red', 'orange', 'yellow', 'lightgreen', 'green'];
+    const labels = ['Muy débil', 'Débil', 'Media', 'Fuerte', 'Muy fuerte'];
+    
+    return {
+      strength: Math.min(strength, 4),
+      color: colors[strength - 1] || 'grey',
+      label: labels[strength - 1] || ''
+    };
   };
 
   return (
@@ -121,9 +206,12 @@ const AuthModal = ({ open, onClose }) => {
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="h2">
-            {activeTab === 0 ? 'Iniciar Sesión' : 'Crear Cuenta'}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <LockIcon color="primary" />
+            <Typography variant="h6" component="h2">
+              {activeTab === 0 ? 'Iniciar Sesión' : 'Crear Cuenta'}
+            </Typography>
+          </Box>
           <IconButton onClick={handleClose} size="small">
             <CloseIcon />
           </IconButton>
@@ -147,6 +235,12 @@ const AuthModal = ({ open, onClose }) => {
           </Alert>
         )}
 
+        {isBlocked && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Demasiados intentos fallidos. Intenta de nuevo en 5 minutos.
+          </Alert>
+        )}
+
         {activeTab === 0 ? (
           // Formulario de Login
           <Box component="form" onSubmit={loginForm.handleSubmit(onSubmitLogin)}>
@@ -162,7 +256,9 @@ const AuthModal = ({ open, onClose }) => {
                   margin="normal"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                  disabled={isLoading}
+                  disabled={isLoading || isBlocked}
+                  autoComplete="email"
+                  autoFocus
                 />
               )}
             />
@@ -179,13 +275,15 @@ const AuthModal = ({ open, onClose }) => {
                   margin="normal"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                  disabled={isLoading}
+                  disabled={isLoading || isBlocked}
+                  autoComplete="current-password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
+                          disabled={isLoading || isBlocked}
                         >
                           {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                         </IconButton>
@@ -201,8 +299,8 @@ const AuthModal = ({ open, onClose }) => {
                 type="submit" 
                 variant="contained" 
                 fullWidth
-                disabled={isLoading}
-                startIcon={isLoading ? <CircularProgress size={20} /> : null}
+                disabled={isLoading || isBlocked}
+                startIcon={isLoading ? <CircularProgress size={20} /> : <PersonIcon />}
               >
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>
@@ -223,6 +321,8 @@ const AuthModal = ({ open, onClose }) => {
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   disabled={isLoading}
+                  autoComplete="username"
+                  autoFocus
                 />
               )}
             />
@@ -240,6 +340,7 @@ const AuthModal = ({ open, onClose }) => {
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               )}
             />
@@ -247,30 +348,43 @@ const AuthModal = ({ open, onClose }) => {
             <Controller
               name="password"
               control={registerForm.control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Contraseña"
-                  type={showPassword ? 'text' : 'password'}
-                  fullWidth
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  disabled={isLoading}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              )}
+              render={({ field, fieldState }) => {
+                const passwordStrength = getPasswordStrength(field.value);
+                return (
+                  <TextField
+                    {...field}
+                    label="Contraseña"
+                    type={showPassword ? 'text' : 'password'}
+                    fullWidth
+                    margin="normal"
+                    error={!!fieldState.error}
+                    helperText={
+                      fieldState.error?.message || 
+                      (field.value && `Fortaleza: ${passwordStrength.label}`)
+                    }
+                    disabled={isLoading}
+                    autoComplete="new-password"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            disabled={isLoading}
+                          >
+                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    sx={{
+                      '& .MuiFormHelperText-root': {
+                        color: passwordStrength.color
+                      }
+                    }}
+                  />
+                );
+              }}
             />
 
             <Controller
@@ -286,12 +400,14 @@ const AuthModal = ({ open, onClose }) => {
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   disabled={isLoading}
+                  autoComplete="new-password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           edge="end"
+                          disabled={isLoading}
                         >
                           {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                         </IconButton>
@@ -308,7 +424,7 @@ const AuthModal = ({ open, onClose }) => {
                 variant="contained" 
                 fullWidth
                 disabled={isLoading}
-                startIcon={isLoading ? <CircularProgress size={20} /> : null}
+                startIcon={isLoading ? <CircularProgress size={20} /> : <PersonIcon />}
               >
                 {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
               </Button>
