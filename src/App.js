@@ -105,6 +105,13 @@ function App() {
         dataToLoad = getTestData();
         localStorage.setItem('shoppingList', JSON.stringify(dataToLoad));
       }
+      
+      // Si forceTestData está activado y hay datos, asegurar que sean datos de prueba
+      if (forceTestData && dataToLoad.length > 0) {
+        const testData = getTestData();
+        dataToLoad = testData;
+        localStorage.setItem('shoppingList', JSON.stringify(testData));
+      }
 
       setProducts(dataToLoad);
       setBackupData(dataToLoad); // Guardar backup para restaurar
@@ -151,17 +158,19 @@ function App() {
   const handleToggleTestData = () => {
     if (!forceTestData) {
       // Activar datos de prueba
-      setBackupData(products); // Guardar backup de los datos reales
+      setBackupData([...products]); // Guardar backup de los datos reales
       const testData = getTestData();
       setProducts(testData);
       localStorage.setItem('shoppingList', JSON.stringify(testData));
-      setCategories([...new Set(testData.map(product => product.category))]);
+      const testCategories = [...new Set(testData.map(product => product.category))];
+      setCategories(testCategories);
       setForceTestData(true);
     } else {
       // Restaurar datos reales/locales
-      setProducts(backupData);
+      setProducts([...backupData]);
       localStorage.setItem('shoppingList', JSON.stringify(backupData));
-      setCategories([...new Set(backupData.map(product => product.category))]);
+      const backupCategories = [...new Set(backupData.map(product => product.category))];
+      setCategories(backupCategories);
       setForceTestData(false);
     }
   };

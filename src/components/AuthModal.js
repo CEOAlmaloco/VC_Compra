@@ -334,21 +334,14 @@ const AuthModal = ({ open, onClose }) => {
                   fullWidth
                   margin="normal"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message || 'Ingresa tu nombre de usuario'}
+                  helperText={fieldState.error?.message}
                   disabled={isLoading}
                   autoComplete="username"
                   autoFocus
                   value={field.value ?? ''}
-                  onChange={(e) => {
-                    field.onChange(e);
-                  }}
+                  onChange={field.onChange}
                   onBlur={field.onBlur}
-                  onFocus={(e) => {
-                    e.target.select();
-                  }}
-                  InputLabelProps={{
-                    shrink: true
-                  }}
+                  placeholder="Ingresa tu nombre de usuario"
                   sx={{
                     '& .MuiInputBase-input, & input': {
                       color: '#000 !important',
@@ -391,30 +384,28 @@ const AuthModal = ({ open, onClose }) => {
                   fullWidth
                   margin="normal"
                   error={!!fieldState.error}
-                  helperText={fieldState.error?.message || 'Ingresa tu email'}
+                  helperText={fieldState.error?.message}
                   disabled={isLoading}
                   autoComplete="email"
                   value={field.value ?? ''}
-                  onChange={(e) => {
-                    console.log('Email onChange:', e.target.value);
-                    field.onChange(e);
-                  }}
+                  onChange={field.onChange}
                   onBlur={field.onBlur}
-                  onFocus={(e) => {
-                    console.log('Email onFocus');
-                  }}
+                  placeholder="Ingresa tu email"
                   sx={{
-                    '& .MuiInputBase-input': {
-                      color: '#000000 !important',
-                      backgroundColor: '#ffffff !important',
+                    '& .MuiInputBase-input, & input': {
+                      color: '#000 !important',
+                      backgroundColor: '#fff !important',
+                      opacity: '1 !important',
+                      visibility: 'visible !important',
                       caretColor: '#1976d2 !important'
                     },
                     '& .MuiInputLabel-root': {
-                      color: '#666666 !important'
+                      color: '#666 !important'
                     },
                     '& .MuiOutlinedInput-root': {
+                      backgroundColor: '#fff !important',
                       '& fieldset': {
-                        borderColor: '#cccccc !important'
+                        borderColor: '#ccc !important'
                       },
                       '&:hover fieldset': {
                         borderColor: '#1976d2 !important'
@@ -424,7 +415,7 @@ const AuthModal = ({ open, onClose }) => {
                       }
                     },
                     '& .MuiFormHelperText-root': {
-                      color: '#666666 !important'
+                      color: '#666 !important'
                     }
                   }}
                 />
