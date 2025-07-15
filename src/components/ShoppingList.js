@@ -201,13 +201,21 @@ const ShoppingList = ({ categories, excludedCategories, products, onAddProduct, 
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 2, 
+        mb: 2, 
+        flexWrap: 'wrap', 
+        alignItems: 'center',
+        width: '100%'
+      }}>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => setOpenForm(true)}
           size="medium"
+          sx={{ flexShrink: 0 }}
         >
           Agregar Producto
         </Button>
@@ -224,14 +232,25 @@ const ShoppingList = ({ categories, excludedCategories, products, onAddProduct, 
             ),
           }}
           size="small"
-          sx={{ minWidth: 200 }}
+          sx={{ 
+            minWidth: 200,
+            flexGrow: 1,
+            maxWidth: 300
+          }}
         />
         
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+        <FormControl 
+          size="small" 
+          sx={{ 
+            minWidth: 200,
+            flexShrink: 0
+          }}
+        >
           <InputLabel>Filtrar por categoría</InputLabel>
           <Select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
+            label="Filtrar por categoría"
           >
             <MenuItem value="">Todas las categorías</MenuItem>
             {categories.map((category) => (
